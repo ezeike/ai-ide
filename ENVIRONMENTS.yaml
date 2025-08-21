@@ -2,27 +2,21 @@
 # This file defines development environments with their properties and settings
 
 environments:
-  - name: "canopy-env"
+  - name: "canopy-testing"
     display_name: "Canopy Development and Testing Tools"
-    language: "go"
-    framework: "gin"
-    role: "server"
-    git_repo: "git@github.com/company/dashboard-client.git"
+    git_repo: "git@github.com/ezeike/canopy-testing.git"
     project: "canopy"
     spacemacs: true
     tmuxinator: true
-    chromium-datadir: true
     description: "Tools to generate Canopy configurations and run chains"
-    working_directory: "~/go/src/canopy-env/"
-    tmuxinator_windows_start:
-    - aichat:
-        panes:
-          - bash
+    working_directory: "~/go/src/canopy-testing/"
+    aichat:
+      model: claude:claude-sonnet-4-20250514
+      session: true
+
 
   - name: "canopy-grpc-server"
     display_name: "Canopy gRPC Server"
-    language: "go"
-    role: "server"
     git_repo: "git@github.com/canopy-network/canopy.git"
     project: "canopy"
     spacemacs: true
@@ -30,15 +24,9 @@ environments:
     branch: "issue-#227"
     description: "Canopy Plugin gRPC server"
     working_directory: "~/go/src/canopy-grpc-server/"
-    tmuxinator_windows:
-    - client:
-        panes:
-          - bash
 
   - name: "canopy-grpc-client"
     display_name: "Canopy gRPC Client"
-    language: "go"
-    role: "client"
     git_repo: "git@github.com/canopy-network/canopy.git"
     project: "canopy"
     spacemacs: true

@@ -151,10 +151,52 @@ class EnvironmentProcessor:
             with open(output_file, "w") as f:
                 f.write(rendered_content)
 
+            # Generate desktop file for tmuxinator session
+            self._generate_tmuxinator_desktop_file(env, context)
+
             print(f"  ✓ Tmuxinator: {env_name}")
 
         except Exception as e:
             print(f"  ✗ Tmuxinator error: {env_name} ({e})")
+            
+    def _generate_tmuxinator_desktop_file(self, env: Dict[str, Any], context: Dict[str, Any]) -> None:
+        """Generate desktop file for tmuxinator session."""
+        env_name = env['name']
+        desktop_template_path = self.script_dir / 'templates' / 'tmuxinator.desktop'
+        desktop_output_dir = Path.home() / '.local' / 'share' / 'applications'
+        desktop_output_file = desktop_output_dir / f'tmuxinator-{env_name}.desktop'
+        
+        # Check if desktop template exists
+        if not desktop_template_path.exists():
+            return  # Silently skip if template doesn't exist
+            
+        try:
+            # Load desktop template
+            with open(desktop_template_path, 'r') as f:
+                desktop_template_content = f.read()
+            
+            # Create Jinja2 environment
+            jinja_env = Environment(
+                trim_blocks=True,
+                lstrip_blocks=True
+            )
+            
+            # Create desktop template
+            desktop_template = jinja_env.from_string(desktop_template_content)
+            
+            # Render desktop template with same context
+            desktop_rendered_content = desktop_template.render(**context)
+            
+            # Ensure output directory exists
+            desktop_output_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Write desktop file
+            with open(desktop_output_file, 'w') as f:
+                f.write(desktop_rendered_content)
+                
+        except Exception:
+            # Silently ignore desktop file generation errors
+            pass
 
     def process_chromium_datadir_action(self, env: Dict[str, Any]) -> None:
         """Process the chromium-datadir property by generating chromium desktop file from template."""

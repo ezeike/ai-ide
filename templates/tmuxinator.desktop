@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Name=Tmux {{ display_name }}
+GenericName=Terminal Session
+Comment={{ description }}
+Exec=tmuxinator start {{ name }}
+Icon=utilities-terminal
+Terminal=true
+Type=Application
+Categories=Development;System;
+Keywords=tmux;terminal;session;{{ name }};{{ project }};
+StartupNotify=true
+
