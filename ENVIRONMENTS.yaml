@@ -46,6 +46,9 @@ environments:
     branch: "issue-#227"
     description: "Canopy Plugin gRPC client"
     working_directory: "~/go/src/canopy-grpc-client/"
+    aichat:
+      model: claude:claude-sonnet-4-20250514
+      session: true
     wm_workspace_names:
       1: www
     tmuxinator_windows:

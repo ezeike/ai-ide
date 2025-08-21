@@ -10,9 +10,11 @@ windows:
   - claude:
       panes:
         - zsh
+{% if aichat %}
   - aichat:
       panes:
-        - zsh
+        - aichat --session {{name}}
+{% endif %}
   - run:
       panes:
         - zsh
@@ -91,7 +93,7 @@ windows:
         - docker ps -a
 {% endif %}
   - git:
-      layout: main-horizontal-flipped
+      layout: main-horizontal
       panes:
         - git status
         - git log --oneline -10

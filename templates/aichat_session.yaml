@@ -1,0 +1,27 @@
+# AIChat Session Configuration for {{ display_name }}
+# Environment: {{ name }}
+# Project: {{ project }}
+
+model: {{ aichat_model }}
+temperature: 0.0
+top_p: 0.0
+
+# Role based on language and project role
+role_name: {{ name }}
+
+# Session context metadata (as comments for reference)
+# Project: {{ project }}
+# Role: {{ role }}
+# Framework: {{ framework or 'none' }}
+# Working Directory: {{ working_dir }}
+{% if env.git_repo %}
+# Repository: {{ env.git_repo }}
+{% endif %}
+{% if env.port %}
+# Port: {{ env.port }}
+{% endif %}
+{% if env.database %}
+# Database: {{ env.database }}
+{% endif %}
+
+messages: []

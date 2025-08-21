@@ -122,6 +122,7 @@ class EnvironmentProcessor:
             # Create Jinja2 template
             template = jinja_env.from_string(template_content)
 
+            aichat_config = env.get("aichat", {})
             # Create template context with full environment access
             context = {
                 "env": env,
@@ -135,6 +136,8 @@ class EnvironmentProcessor:
                 "framework": env.get("framework", ""),
                 "role": env.get("role", ""),
                 "project": env.get("project", ""),
+                "aichat": aichat_config,
+                "aichat_model": aichat_config.get("model", "openai:gpt-4o"),
                 "tmuxinator_windows_start": env.get("tmuxinator_windows_start", []),
                 "tmuxinator_windows": env.get("tmuxinator_windows", []),
                 "tmuxinator_windows_end": env.get("tmuxinator_windows_end", []),
@@ -220,6 +223,78 @@ class EnvironmentProcessor:
 
         except Exception as e:
             print(f"  ✗ Chromium error: {env_name} ({e})")
+
+    def process_aichat_action(self, env: Dict[str, Any]) -> None:
+        """Process the aichat property by generating aichat session config from template."""
+        # Check if aichat property exists (any truthy value triggers session creation)
+        if not env.get("aichat", False):
+            return
+
+        env_name = env["name"]
+        template_path = self.script_dir / "templates" / "aichat_session.yaml"
+        output_dir = Path.home() / ".config" / "aichat" / "sessions"
+        output_file = output_dir / f"{env_name}.yaml"
+
+        # Check if template exists
+        if not template_path.exists():
+            print(
+                f"Warning: Template {template_path} not found, skipping aichat action for {env_name}"
+            )
+            return
+
+        # Ensure output directory exists
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        try:
+            # Load template
+            with open(template_path, "r") as f:
+                template_content = f.read()
+
+            # Create Jinja2 environment with custom filters and whitespace control
+            jinja_env = Environment(
+                trim_blocks=True,  # Remove newlines after block tags
+                lstrip_blocks=True,  # Remove leading whitespace before block tags
+            )
+
+            def yaml_filter(value):
+                """Convert Python object to YAML string."""
+                return yaml.dump(value, default_flow_style=False).rstrip()
+
+            jinja_env.filters["toyaml"] = yaml_filter
+
+            # Create Jinja2 template
+            template = jinja_env.from_string(template_content)
+
+            # Create template context with full environment access
+            aichat_config = env.get("aichat", {})
+            context = {
+                "env": env,
+                "global": self.global_config,
+                "templates": self.templates,
+                "name": env["name"],
+                "display_name": env.get("display_name", env["name"]),
+                "working_dir": env.get("working_directory", "~/"),
+                "description": env.get("description", ""),
+                "language": env.get("language", ""),
+                "framework": env.get("framework", ""),
+                "role": env.get("role", ""),
+                "project": env.get("project", ""),
+                "aichat": aichat_config,
+                "aichat_model": aichat_config.get("model", "openai:gpt-4o"),
+                "wm_workspace_names": env.get("wm_workspace_names", {}),
+            }
+
+            # Render template
+            rendered_content = template.render(**context)
+
+            # Write output file
+            with open(output_file, "w") as f:
+                f.write(rendered_content)
+
+            print(f"  ✓ AIChat: {env_name}")
+
+        except Exception as e:
+            print(f"  ✗ AIChat error: {env_name} ({e})")
 
     def switch_to_environment(self, env: Dict[str, Any]) -> None:
         """Switch to an environment by executing environment-specific tasks."""
@@ -326,9 +401,8 @@ class EnvironmentProcessor:
         # Process chromium-datadir action
         self.process_chromium_datadir_action(env)
 
-        # Add more action processors here as needed
-        # Example:
-        # self.process_aichat_action(env)
+        # Process aichat action
+        self.process_aichat_action(env)
 
     def process_all_environments(self) -> None:
         """Process all environments in the configuration."""
