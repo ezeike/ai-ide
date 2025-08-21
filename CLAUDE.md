@@ -23,7 +23,6 @@ This configuration was previously managed through a Nix-based architecture where
 
 ### Application Management
 - Desktop files in `applications/` directory provide project-specific Emacs launchers
-- `generate-desktop-files.sh` automates creation of environment-specific Emacs desktop entries
 - Each desktop file launches Emacs with environment-specific socket names and configurations
 
 ### Sub-configurations
@@ -49,15 +48,6 @@ cd ~/.config/home-manager
 
 # Edit configuration files directly
 # No special deployment commands needed - use standard file operations
-```
-
-### Desktop File Management
-```bash
-# Regenerate all Emacs desktop files
-cd applications && ./generate-desktop-files.sh
-
-# Deploy desktop files to system
-cp applications/*.desktop ~/.local/share/applications/
 ```
 
 ### Development Environment Setup
@@ -154,23 +144,3 @@ The system includes dual email account setup:
 ├── tmuxinator/         # tmux session templates
 └── bin/                # Custom scripts and utilities
 ```
-
-## Common Development Tasks
-
-### Adding New Environments
-1. Add environment name to `applications/generate-desktop-files.sh`
-2. Run the script to generate desktop file
-3. Optionally create corresponding tmuxinator session template
-4. Add any environment-specific Emacs configuration
-
-### Updating System Configuration
-1. Edit relevant configuration files in this directory
-2. ~~Run `home-manager switch` to apply changes~~ **DEPRECATED**
-3. Manually copy/link configuration files to their appropriate system locations
-4. Some changes (like i3 config) may require restart of specific services
-5. Desktop files require manual deployment to `~/.local/share/applications/`
-
-### Email Setup
-- Ensure password files exist: `~/.mbsync-fastmail`, `~/.mbsync-grove`
-- Run `mbsync -a` to sync mail initially
-- Use `mu index` to build search index for mu4e in Emacs
