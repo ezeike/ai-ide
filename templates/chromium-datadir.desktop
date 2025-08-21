@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Chromium - {{ display_name }}
+Comment=Chromium - {{ description }}
+Exec=chromium --user-data-dir=/home/enielson/.config/chromium/data-{{ name }} --class={{name}}
+Icon=chromium
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
+StartupWMClass={{name}}
+

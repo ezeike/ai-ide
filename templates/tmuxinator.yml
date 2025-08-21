@@ -1,0 +1,102 @@
+name: {{ name }}
+root: {{ working_dir }}
+
+pre_window: export EDITOR={{ global.default_editor or 'nvim' }}; export TERM=screen-256color
+
+windows:
+{% if tmuxinator_windows_start %}
+{{ tmuxinator_windows_start | toyaml | indent(2, True) }}
+{% endif %}
+  - claude:
+      panes:
+        - zsh
+  - aichat:
+      panes:
+        - zsh
+  - run:
+      panes:
+        - zsh
+{% if tmuxinator_windows %}
+{{ tmuxinator_windows | toyaml | indent(2, True) }}
+{% endif %}
+{% if language == 'go' %}
+  - test:
+      layout: tiled
+      panes:
+        - go test -v
+        - go test -bench=.
+        - go test -race
+        - zsh
+  - build:
+      layout: main-horizontal
+      panes:
+        - go build -v
+        - go run main.go
+        - zsh
+{% endif %}
+{% if language == 'javascript' or language == 'typescript' %}
+  - dev:
+      layout: main-vertical
+      panes:
+        - {{ global.default_editor or 'nvim' }}
+        - npm run dev
+        - npm test
+{% endif %}
+{% if language == 'python' %}
+  - dev:
+      layout: main-vertical
+      panes:
+        - {{ global.default_editor or 'nvim' }}
+        - python -m {{ name.replace('-', '_') }}
+        - pytest
+{% endif %}
+{% if language == 'rust' %}
+  - dev:
+      layout: main-vertical
+      panes:
+        - {{ global.default_editor or 'nvim' }}
+        - cargo run
+        - cargo test
+  - build:
+      layout: main-horizontal
+      panes:
+        - cargo build
+        - cargo clippy
+        - zsh
+{% endif %}
+{% if role == 'server' or framework in ['express', 'fastapi', 'gin', 'axum'] %}
+  - logs:
+      layout: even-horizontal
+      panes:
+        - tail -f logs/debug.log
+        - tail -f logs/error.log
+  - monitor:
+      layout: main-vertical-flipped
+      panes:
+        - htop
+        - watch -n 2 "netstat -tlnp"
+        - zsh
+{% endif %}
+{% if env.database %}
+  - database:
+      panes:
+        - {% if env.database == 'postgresql' %}psql {{ env.get('environment_vars', {}).get('DATABASE_URL', 'postgresql://localhost:5432/dev') }}{% elif env.database == 'mysql' %}mysql -u root -p{% elif env.database == 'mongodb' %}mongo{% else %}zsh{% endif %}
+{% endif %}
+{% if 'docker' in (env.tools or []) or role == 'infrastructure' %}
+  - docker:
+      layout: even-vertical
+      panes:
+        - docker-compose up
+        - docker logs -f {{ name }}
+        - docker ps -a
+{% endif %}
+  - git:
+      layout: main-horizontal-flipped
+      panes:
+        - git status
+        - git log --oneline -10
+        - zsh
+
+{% if tmuxinator_windows_end %}
+{{ tmuxinator_windows_end | toyaml | indent(2, True) }}
+{% endif %}

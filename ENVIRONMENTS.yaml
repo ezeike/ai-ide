@@ -1,0 +1,99 @@
+# Integrated Development Environments Configuration
+# This file defines development environments with their properties and settings
+
+environments:
+  - name: "canopy-env"
+    display_name: "Canopy Development and Testing Tools"
+    language: "go"
+    framework: "gin"
+    role: "server"
+    git_repo: "git@github.com/company/dashboard-client.git"
+    project: "canopy"
+    spacemacs: true
+    tmuxinator: true
+    chromium-datadir: true
+    description: "Tools to generate Canopy configurations and run chains"
+    working_directory: "~/go/src/canopy-env/"
+    tmuxinator_windows_start:
+    - aichat:
+        panes:
+          - bash
+
+  - name: "canopy-grpc-server"
+    display_name: "Canopy gRPC Server"
+    language: "go"
+    role: "server"
+    git_repo: "git@github.com/canopy-network/canopy.git"
+    project: "canopy"
+    spacemacs: true
+    tmuxinator: true
+    branch: "issue-#227"
+    description: "Canopy Plugin gRPC server"
+    working_directory: "~/go/src/canopy-grpc-server/"
+    tmuxinator_windows:
+    - client:
+        panes:
+          - bash
+
+  - name: "canopy-grpc-client"
+    display_name: "Canopy gRPC Client"
+    language: "go"
+    role: "client"
+    git_repo: "git@github.com/canopy-network/canopy.git"
+    project: "canopy"
+    spacemacs: true
+    tmuxinator: true
+    branch: "issue-#227"
+    description: "Canopy Plugin gRPC client"
+    working_directory: "~/go/src/canopy-grpc-client/"
+    wm_workspace_names:
+      1: www
+    tmuxinator_windows:
+    - client:
+        panes:
+          - bash
+
+
+# Global configuration
+global:
+  default_shell: "zsh"
+  default_editor: "nvim"
+  tmux_session_prefix: "dev"
+  git_user: "Eric Nielson"
+  git_email: "ericnielson@fastmail.mx"
+  
+# Environment templates for quick creation
+templates:
+  node_api:
+    language: "javascript"
+    framework: "express"
+    role: "server"
+    port: 8000
+    tools:
+      - "node"
+      - "npm"
+      - "nodemon"
+      - "jest"
+    
+  react_client:
+    language: "javascript"
+    framework: "react"
+    role: "client"
+    port: 3000
+    tools:
+      - "node"
+      - "npm"
+      - "eslint"
+      - "prettier"
+      
+  python_service:
+    language: "python"
+    framework: "fastapi"
+    role: "server"
+    port: 8000
+    tools:
+      - "python"
+      - "pip"
+      - "uvicorn"
+      - "pytest"
+    python_version: "3.11"
